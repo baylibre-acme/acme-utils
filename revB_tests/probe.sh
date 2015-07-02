@@ -11,6 +11,7 @@ source util.sh
 PROBE_EXPANDER_NAME="pca9535"
 INA_NAME="ina226"
 PROBE_EEPROM_NAME="24c02"
+LOG_FILE="/tmp/acme.log"
 
 touch_probes_expander() {
 	set -e

@@ -50,7 +50,7 @@ do
 				printf "power\t\tcurr\t\tVbus\t\tVshunt\n"
 				for i in $(seq 1 3)
 				do
-					print_measurements
+					MSR=$(print_measurements | tee /dev/tty)
 					usleep 50000
 				done
 				del_ina_dev $ADDR
@@ -65,9 +65,14 @@ do
 				echo "EEPROM OK"
 
 				echo "Reading serial number"
-				probe_read_serial $ADDR
+				SERIAL=$(probe_read_serial $ADDR | tee /dev/tty)
 				echo "Reading MAC address"
 				probe_read_mac $ADDR
+
+				echo "Storing data in $LOG_FILE"
+				echo "HE10 probe $SERIAL:" >> $LOG_FILE
+				echo "$MSR" >> $LOG_FILE
+				echo >> $LOG_FILE
 				set +e
 
 				echo "HE10 probe at address $ADDR: all tests passed!"
