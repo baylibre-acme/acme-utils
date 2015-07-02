@@ -45,12 +45,13 @@ do
 				echo "Probe found at address $ADDR, running tests..."
 				gpio_set $GPIO_NUM 1
 
-				sleep 4 # Let the usb-stick be detected
+				echo "Waiting for the USB disk"
+				wait_for_sda
 				test -b /dev/sda1 || die "USB memory stick not detected!"
 
-				set -e
 				echo "Mounting the USB stick"
-				mkdir /tmp/usb0
+				mkdir /tmp/usb0 2> /dev/null
+				set -e
 				mount /dev/sda1 /tmp/usb0
 
 				echo "Creating a file with random data"

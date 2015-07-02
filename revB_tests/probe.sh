@@ -118,6 +118,20 @@ gpio_num_from_addr() {
 	fi
 }
 
+probe_eeprom_write() {
+	_ADDR=$1
+	_BUF=$2
+
+	echo -ne $_BUF | dd of=$(get_eeprom_path $_ADDR) bs=128 seek=1 2>/dev/null
+}
+
+probe_eeprom_read() {
+	_ADDR=$1
+	_SIZE=$2
+
+	dd if=$(get_eeprom_path $_ADDR) bs=$_SIZE count=1 skip=1 2> /dev/null
+}
+
 make_probe_eeprom() {
 	_ADDR=$(printf "0x%x\n" $(( $1 + 0x10 )))
 
@@ -132,13 +146,13 @@ del_probe_eeprom() {
 
 test_probe_eeprom() {
 	_ADDR=$(printf "0x%x\n" $(( $1 + 0x10 )))
-	NUM_BYTES=255
+	NUM_BYTES=128
 
 	echo "Writing $NUM_BYTES random bytes to the probe EEPROM"
 	BYTES=$(dd if=/dev/urandom bs=$NUM_BYTES count=1 2> /dev/null | uuencode foo | tr -d '\n' | tr -d ' ' | dd bs=$NUM_BYTES count=1 2> /dev/null)
-	cape_eeprom_write $_ADDR $BYTES
+	probe_eeprom_write $_ADDR $BYTES
 	echo "Reading back the data and comparing"
-	READ_BACK_BUF=$(cape_eeprom_read $_ADDR $NUM_BYTES)
+	READ_BACK_BUF=$(probe_eeprom_read $_ADDR $NUM_BYTES)
 	test "$BYTES" == "$READ_BACK_BUF" || die "EEPROM contents are not the same as the bytes written"
 }
 
@@ -157,4 +171,14 @@ probe_read_mac() {
 
 	printf "MAC address: %02x %02x %02x %02x %02x %02x\n" \
 		$(i2cget -y 1 $_ADDR 0x9a) $(i2cget -y 1 $_ADDR 0x9b) $(i2cget -y 1 $_ADDR 0x9c) $(i2cget -y 1 $_ADDR 0x9d) $(i2cget -y 1 $_ADDR 0x9e) $(i2cget -y 1 $_ADDR 0x9f)
+}
+
+wait_for_sda() {
+	for SEC in $(seq 1 10)
+	do
+		sleep 1
+		test -b /dev/sda1 && return 0
+	done
+
+	die "USB disk not detected"
 }
