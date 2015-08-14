@@ -95,27 +95,27 @@ gpio_num_from_addr() {
 
 	if [ "$_ADDR" == "0x40" ]
 	then
-		echo "495"
+		echo "489"
 	elif [ "$_ADDR" == "0x41" ]
 	then
-		echo "496"
+		echo "491"
 	elif [ "$_ADDR" == "0x42" ]
 	then
-		echo "491"
+		echo "493"
 	elif [ "$_ADDR" == "0x43" ]
 	then
-		echo "500"
+		echo "495"
 	elif [ "$_ADDR" == "0x44" ]
 	then
-		echo "493"
+		echo "497"
 	elif [ "$_ADDR" == "0x45" ]
 	then
-		echo "498"
+		echo "499"
 	elif [ "$_ADDR" == "0x46" ]
 	then
-		echo "489"
+		echo "501"
 	else
-		echo "497"
+		echo "503"
 	fi
 }
 
