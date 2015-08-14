@@ -28,11 +28,11 @@ echo "OK"
 echo "Cape EEPROM micro-switch tests"
 echo "Addresses corresponding with each switch setting:"
 echo
-echo "Facing 'up' (towards the power supply port)"
+echo "Facing 'up' (towards the power ethernet port)"
 echo
 echo "0x54    0x55    0x56     0x57"
-echo "|  |    X  |    |  X     X  X"
 echo "X  X    |  X    X  |     |  |"
+echo "|  |    X  |    |  X     X  X"
 echo
 echo "Set the switcher to the desired setting and press ENTER"
 read
