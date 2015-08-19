@@ -81,6 +81,8 @@ do
 				echo "Reading MAC address"
 				probe_read_mac $ADDR
 
+				gpio_set $GPIO_NUM 0
+
 				echo "Storing data in $LOG_FILE"
 				echo "Jack $ADDR $SERIAL	$MSR" >> $LOG_FILE
 				set +e
