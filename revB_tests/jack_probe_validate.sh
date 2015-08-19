@@ -82,9 +82,7 @@ do
 				probe_read_mac $ADDR
 
 				echo "Storing data in $LOG_FILE"
-				echo "Jack probe $SERIAL:" >> $LOG_FILE
-				echo "$MSR" >> $LOG_FILE
-				echo >> $LOG_FILE
+				echo "Jack $ADDR $SERIAL	$MSR" >> $LOG_FILE
 				set +e
 
 				echo "Jack probe at address $ADDR: all tests passed!"

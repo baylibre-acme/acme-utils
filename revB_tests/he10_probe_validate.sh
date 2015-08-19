@@ -70,9 +70,7 @@ do
 				probe_read_mac $ADDR
 
 				echo "Storing data in $LOG_FILE"
-				echo "HE10 probe $SERIAL:" >> $LOG_FILE
-				echo "$MSR" >> $LOG_FILE
-				echo >> $LOG_FILE
+				echo "HE10 $ADDR $SERIAL	$MSR" >> $LOG_FILE
 				set +e
 
 				echo "HE10 probe at address $ADDR: all tests passed!"

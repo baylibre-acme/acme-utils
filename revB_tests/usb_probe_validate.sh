@@ -97,9 +97,7 @@ do
 				probe_read_mac $ADDR
 
 				echo "Storing data in $LOG_FILE"
-				echo "USB probe $SERIAL:" >> $LOG_FILE
-				echo "$MSR" >> $LOG_FILE
-				echo >> $LOG_FILE
+				echo "USB $ADDR $SERIAL	$MSR" >> $LOG_FILE
 				set +e
 
 				echo "USB probe at address $ADDR: all tests passed!"
