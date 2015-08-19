@@ -8,6 +8,8 @@ source defs.sh
 source cape.sh
 source probe.sh
 
+SHUNT=10000
+
 init_cape
 
 echo
@@ -21,6 +23,9 @@ echo "one HE10 probe attached to a power-rail on the measured device."
 echo
 echo "Press ENTER when ready to proceed"
 read
+
+echo "Enter shunt resistor value [10 mOhm]:"
+read SHUNT
 
 set -e
 make_cape_expander_dev
@@ -45,6 +50,7 @@ do
 				sleep 1 # Let the beagle turn-on
 
 				make_ina_dev $ADDR
+				set_shunt $(expr $SHUNT * 1000)
 				sync &
 				echo "Current measurements:"
 				printf "power\t\tcurr\t\tVbus\t\tVshunt\n"
