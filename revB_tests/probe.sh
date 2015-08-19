@@ -148,13 +148,16 @@ del_probe_eeprom() {
 test_probe_eeprom() {
 	_ADDR=$(printf "0x%x\n" $(( $1 + 0x10 )))
 	NUM_BYTES=128
+	KNOWN_BYTES="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+	ZERO_BYTES="00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
-	echo "Writing $NUM_BYTES random bytes to the probe EEPROM"
-	BYTES=$(dd if=/dev/urandom bs=$NUM_BYTES count=1 2> /dev/null | uuencode foo | tr -d '\n' | tr -d ' ' | dd bs=$NUM_BYTES count=1 2> /dev/null)
-	probe_eeprom_write $_ADDR $BYTES
+	echo "Erasing EEPROM"
+	probe_eeprom_write $_ADDR $ZERO_BYTES
+	echo "Writing $NUM_BYTES known bytes to the probe EEPROM"
+	probe_eeprom_write $_ADDR $KNOWN_BYTES
 	echo "Reading back the data and comparing"
 	READ_BACK_BUF=$(probe_eeprom_read $_ADDR $NUM_BYTES)
-	test "$BYTES" == "$READ_BACK_BUF" || die "EEPROM contents are not the same as the bytes written"
+	test "$KNOWN_BYTES" == "$READ_BACK_BUF" || die "EEPROM contents are not the same as the bytes written"
 }
 
 probe_read_serial() {
