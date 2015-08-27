@@ -71,7 +71,6 @@ do
 					MSR=$(print_measurements | tee /dev/tty)
 					usleep 50000
 				done
-				del_ina_dev $ADDR
 				wait
 
 				echo "Comparing files"
@@ -82,6 +81,25 @@ do
 				rm /tmp/foo /tmp/usb0/foo
 				umount /tmp/usb0
 				rmdir /tmp/usb0
+
+				echo "Testing the power switch"
+				sleep 1
+				echo "The device will now be powered-off"
+				gpio_set $GPIO_NUM 0
+				echo "Checking power"
+				sleep 1
+				CURR=$(read_hwmon0 "curr1_input")
+				test "$CURR" -eq "0" || die "Power not cut-off properly"
+				echo "Power cut-off properly"
+				echo "Restoring power"
+				gpio_set $GPIO_NUM 1
+				echo "Checking power"
+				sleep 1
+				CURR=$(read_hwmon0 "curr1_input")
+				test "$CURR" -eq "0" && die "Power not restored properly"
+				echo "Power restored properly"
+
+				del_ina_dev $ADDR
 
 				echo "Testing probe EEPROM"
 				probes_eeprom_disable_wp
