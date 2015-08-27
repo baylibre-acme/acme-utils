@@ -54,18 +54,25 @@ do
 					MSR=$(print_measurements | tee /dev/tty)
 					usleep 50000
 				done
-				del_ina_dev $ADDR
 
 				echo "Testing the power switch"
 				sleep 1
-				echo "The device will no be powered-off"
+				echo "The device will now be powered-off"
 				gpio_set $GPIO_NUM 0
-				echo "Is the device powered-off? [Y/n]"
-				get_user_confirm || die "Error testing the power switch"
+				echo "Checking power"
+				sleep 1
+				CURR=$(read_hwmon0 "curr1_input")
+				test "$CURR" -eq "0" || die "Power not cut-off properly"
+				echo "Power cut-off properly"
 				echo "Restoring power"
 				gpio_set $GPIO_NUM 1
-				echo "Is the power restored? [Y/n]"
-				get_user_confirm || die "Error testing the power switch"
+				echo "Checking power"
+				sleep 1
+				CURR=$(read_hwmon0 "curr1_input")
+				test "$CURR" -eq "0" && die "Power not restored properly"
+				echo "Power restored properly"
+
+				del_ina_dev $ADDR
 
 				set -e
 				echo "Testing probe EEPROM"
