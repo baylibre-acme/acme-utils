@@ -56,7 +56,7 @@ $SERIAL
 if [ ! "$#" == "2" ]
 then
 	echo "usage:"
-	echo "	mkeeprom_wrapper.sh <path to mkeeprom> <serial number>"
+	echo "	flash_cape_eeprom.sh <path to mkeeprom> <serial number>"
 	exit 1
 fi
 
