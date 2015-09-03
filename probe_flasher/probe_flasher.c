@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
 	eeprom.rev = (int)'B';
 
 	eeprom.shunt = strtoul(argv[2], NULL, 10);
-	assert(eeprom.shunt != 0);
 
 	eeprom.pwr_sw = eeprom.type == 3 ? 0 : 1;
 
