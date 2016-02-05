@@ -1,7 +1,3 @@
-# libiio - Library for interfacing industrial I/O (IIO) devices
-#
-# Copyright (C) 2014 Analog Devices, Inc.
-# Author: Paul Cercueil <paul.cercueil@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -24,7 +20,7 @@ CFLAGS = -Wall -g -O1
 all: $(TARGETS)
 
 dut-dump-probe: dut-dump-probe.o
-	$(CC) -o $@ $^ $(LDFLAGS) 
+	$(CROSS_COMPILE)$(CC) -o $@ $^ $(LDFLAGS) 
 
 #install: dut-dump-probe
 #	sudo install -s -v $^ /usr/bin

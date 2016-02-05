@@ -57,6 +57,7 @@ static const uint8_t enrg_i2c_addrs[] = {
 
 static FILE *fout;
 static int bus_number = 1;
+static int probe_number;
 
 
 static const struct option options[] = {
@@ -73,22 +74,38 @@ static const char *options_descriptions[] = {
 
 static void dump_probe(struct probe_eeprom *p)
 {
+	switch (p->type) {
+		case EEPROM_PROBE_TYPE_USB:
+			printf("PowerProbe USB @slot %d:", probe_number);
+			break;
+		case EEPROM_PROBE_TYPE_JACK:
+			printf("PowerProbe JACK @slot %d:", probe_number);
+			break;
+		case EEPROM_PROBE_TYPE_HE10:
+			printf("PowerProbe HE10 @slot %d:", probe_number);
+			break;
+		default:
+			printf("invalid probe type %d", p->type);
+			return;
+	}
 
+/*uint32_t rev;
+        uint32_t shunt;
+        uint8_t pwr_sw;
+        uint8_t serial[EEPROM_SERIAL_SIZE];
+        int8_t tag[EEPROM_TAG_SIZE];*/
 }
 
 static void usage(char* app)
 {
 	unsigned int i;
 
-	printf("Usage:\n\t %s [-b <bus>] <probe_number> \n\nOptions:\n", app);
+	printf("Usage:\n\t %s [-b <bus>] <probe_number in 0..7> \n\nOptions:\n", app);
 	for (i = 0; options[i].name; i++)
 		printf("\t-%c, --%s\n\t\t\t%s\n",
 		       options[i].val, options[i].name,
 		       options_descriptions[i]);
 }
-
-static char bus_path[128] = "/sys/class/i2c-dev/i2c-1";
-static char device_path[128] = "1-0050";
 
 int main(int argc, char **argv)
 {
@@ -103,9 +120,7 @@ int main(int argc, char **argv)
 			return EXIT_SUCCESS;
 		case 'b':
 			arg_index += 2;
-			bus_number = argv[arg_index][0];
-			bus_path[strlen(bus_path)-1] = bus_number;
-			printf("Using bus path %s\n", bus_path);
+			bus_number = argv[arg_index][0] - '0';
 			break;
 		case '?':
 			return EXIT_FAILURE;
@@ -118,10 +133,17 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	device_path[strlen(device_path)-1] = argv[arg_index][0];
-	device_path[0] = bus_number;
+	probe_number = argv[arg_index][0] - '0';
 
-	sprintf(temp,"%s/device/%s/eeprom", bus_path, device_path);
+	if ((probe_number > 7) || (probe_number < 0)) {
+		fprintf(stderr, "Invalid probe number %d.\n\n", probe_number);
+		usage(argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	sprintf(temp,"/sys/class/i2c-dev/i2c-%1d/device/%1d-005%1d/eeprom",
+				bus_number, bus_number, probe_number );
+
 
 	printf("Trying %s\n", temp);
 
