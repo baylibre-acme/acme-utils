@@ -22,7 +22,6 @@
 #include <math.h>
 #include <assert.h>
 
-
 #define EEPROM_SERIAL_SIZE		16
 #define EEPROM_TAG_SIZE			32
 
@@ -50,15 +49,9 @@ static struct probe_eeprom *my_probe;
 #define EEPROM_OFF_SERIAL	(3 * sizeof(uint32_t) + 1)
 #define EEPROM_OFF_TAG		(EEPROM_OFF_SERIAL + EEPROM_SERIAL_SIZE)
 
-static const uint8_t enrg_i2c_addrs[] = {
-	0x40, 0x41, 0x44, 0x45, 0x42, 0x43, 0x46, 0x47,
-};
-
-
 static FILE *fout;
 static int bus_number = 1;
 static int probe_number;
-
 
 static const struct option options[] = {
 	{"help", no_argument, 0, 'h'},
@@ -71,36 +64,46 @@ static const char *options_descriptions[] = {
 	"the number of the i2c bus, usually it will be i2c1.",
 };
 
-
 static void dump_probe(struct probe_eeprom *p)
 {
 	switch (p->type) {
-		case EEPROM_PROBE_TYPE_USB:
-			printf("PowerProbe USB @slot %d:", probe_number);
-			break;
-		case EEPROM_PROBE_TYPE_JACK:
-			printf("PowerProbe JACK @slot %d:", probe_number);
-			break;
-		case EEPROM_PROBE_TYPE_HE10:
-			printf("PowerProbe HE10 @slot %d:", probe_number);
-			break;
-		default:
-			printf("invalid probe type %d", p->type);
-			return;
+	case EEPROM_PROBE_TYPE_USB:
+		printf("PowerProbe USB @slot %d:", probe_number);
+		break;
+	case EEPROM_PROBE_TYPE_JACK:
+		printf("PowerProbe JACK @slot %d:", probe_number);
+		break;
+	case EEPROM_PROBE_TYPE_HE10:
+		printf("PowerProbe HE10 @slot %d:", probe_number);
+		break;
+	default:
+		printf("invalid probe type %d", p->type);
+		return;
 	}
 
-/*uint32_t rev;
-        uint32_t shunt;
-        uint8_t pwr_sw;
-        uint8_t serial[EEPROM_SERIAL_SIZE];
-        int8_t tag[EEPROM_TAG_SIZE];*/
+        switch (p->rev) {
+        case 'B':
+                printf("\tReB\n");
+                break;
+        default:
+                printf("Rev??");
+                return;
+        }
+
+	if (p->pwr_sw)
+		printf("\tHas Power Switch");
+
+	printf("\tRShunt: %d", p->shunt);
+	printf("\tSerNum: %x", *(uint32_t*)p->serial);
 }
 
-static void usage(char* app)
+
+static void usage(char *app)
 {
 	unsigned int i;
 
-	printf("Usage:\n\t %s [-b <bus>] <probe_number in 0..7> \n\nOptions:\n", app);
+	printf("Usage:\n\t %s [-b <bus>] <probe_number in 0..7> \n\nOptions:\n",
+	       app);
 	for (i = 0; options[i].name; i++)
 		printf("\t-%c, --%s\n\t\t\t%s\n",
 		       options[i].val, options[i].name,
@@ -141,9 +144,8 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	sprintf(temp,"/sys/class/i2c-dev/i2c-%1d/device/%1d-005%1d/eeprom",
-				bus_number, bus_number, probe_number );
-
+	sprintf(temp, "/sys/class/i2c-dev/i2c-%1d/device/%1d-005%1d/eeprom",
+		bus_number, bus_number, probe_number);
 
 	printf("Trying %s\n", temp);
 
@@ -153,7 +155,8 @@ int main(int argc, char **argv)
 		return -2;
 	}
 
-	if (fread(my_probe, sizeof(struct probe_eeprom), 1, fout) == sizeof(struct probe_eeprom))
+	if (fread(my_probe, sizeof(struct probe_eeprom), 1, fout) ==
+	    sizeof(struct probe_eeprom))
 		dump_probe(my_probe);
 
 	return 0;

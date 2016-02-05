@@ -19,8 +19,8 @@ CFLAGS = -Wall -g -O1
 
 all: $(TARGETS)
 
-dut-dump-probe: dut-dump-probe.o
-	$(CROSS_COMPILE)$(CC) -o $@ $^ $(LDFLAGS) 
+dut-dump-probe: dut-dump-probe.c
+	$(CROSS_COMPILE)gcc -o $@ dut-dump-probe.c $(CFLAGS)
 
 #install: dut-dump-probe
 #	sudo install -s -v $^ /usr/bin
