@@ -40,7 +40,7 @@ struct probe_eeprom {
 	int8_t tag[EEPROM_TAG_SIZE];
 };
 
-static struct probe_eeprom *my_probe;
+static struct probe_eeprom my_probe;
 
 #define EEPROM_SIZE (3 * sizeof(uint32_t) + 1 + EEPROM_SERIAL_SIZE + EEPROM_TAG_SIZE)
 
@@ -190,9 +190,9 @@ int main(int argc, char **argv)
 		return -2;
 	}
 
-	if (fread(my_probe, sizeof(struct probe_eeprom), 1, fout) ==
+	if (fread(&my_probe, sizeof(struct probe_eeprom), 1, fout) ==
 	    sizeof(struct probe_eeprom))
-		dump_probe(my_probe, print_flags);
+		dump_probe(&my_probe, print_flags);
 
 	return 0;
 }
