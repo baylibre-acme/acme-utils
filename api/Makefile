@@ -26,7 +26,7 @@ dut-dump-probe: dut-dump-probe.c
 	$(CC) -o $@ dut-dump-probe.c $(CFLAGS)
 
 install: $(TARGETS)
-	fakeroot install -s -v  dut-dump-probe $(DESTDIR)/usr/bin
+	fakeroot install -v  dut-dump-probe $(DESTDIR)/usr/bin
 	fakeroot install -v dut-switch-on $(DESTDIR)/usr/bin
 	fakeroot install -v dut-switch-off $(DESTDIR)/usr/bin
 	fakeroot install -v dut-hard-reset $(DESTDIR)/usr/bin
