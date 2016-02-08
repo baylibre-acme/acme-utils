@@ -7,7 +7,9 @@ The following scripts and Apps figure the ACME command-line API:
 * dut-switch-on
 * dut-switch-off
 * dut-hard-reset
-* dur-dump-probe
+* dut-dump-probe
+
+Called with the probe-number (1-based) as parameter.
 
 ## Buildroot integration
 
