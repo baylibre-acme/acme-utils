@@ -1,4 +1,6 @@
 #
+# Copyright (c) 2016 BayLibre SAS
+#
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
@@ -9,22 +11,22 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 
-kversion=$(shell uname -r)
+DESTDIR?=$(INSTALL_MOD_PATH)/usr/bin
+CC=?=$(CROSS_COMPILE)gcc
+CFLAGS?=-Wall -g -O1
 
-TARGETS := dut-dump-probe
-
-CFLAGS = -Wall -g -O1
-
-.PHONY: all clean
+TARGETS:=dut-dump-probe \
+	dut-switch-on \
+	dut-switch-off \
+	dut-hard-reset
 
 all: $(TARGETS)
 
 dut-dump-probe: dut-dump-probe.c
-	$(CROSS_COMPILE)gcc -o $@ dut-dump-probe.c $(CFLAGS)
+	$(CC) -o $@ dut-dump-probe.c $(CFLAGS)
 
-#install: dut-dump-probe
-#	sudo install -s -v $^ /usr/bin
+install: $(TARGETS)
+	fakeroot install -s -v $^ $(DESTDIR)
 
 clean:
-	rm -f $(TARGETS) *.o
-	rm -f ./*.mimetype ./*.dat ./*.png *.csv
+	rm -f dut-dump-probe *.o

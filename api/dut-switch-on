@@ -1,0 +1,8 @@
+#!/bin/sh
+
+num=$((2*$(( $1 -1 ))+489))
+
+#; num=$(( $num + 489 ));echo $num
+
+echo 1 > /sys/class/gpio/gpio$num/value
+
