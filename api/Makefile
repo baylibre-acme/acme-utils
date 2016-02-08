@@ -11,7 +11,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 
-DESTDIR?=$(INSTALL_MOD_PATH)/usr/bin
+DESTDIR?=$(INSTALL_MOD_PATH)
 CC?=$(CROSS_COMPILE)gcc
 CFLAGS?=-Wall -g -O1
 
@@ -26,10 +26,10 @@ dut-dump-probe: dut-dump-probe.c
 	$(CC) -o $@ dut-dump-probe.c $(CFLAGS)
 
 install: $(TARGETS)
-	fakeroot install -s -v  dut-dump-probe $(DESTDIR)
-	fakeroot install -v dut-switch-on $(DESTDIR)
-	fakeroot install -v dut-switch-off $(DESTDIR)
-	fakeroot install -v dut-hard-reset $(DESTDIR)
+	fakeroot install -s -v  dut-dump-probe $(DESTDIR)/usr/bin
+	fakeroot install -v dut-switch-on $(DESTDIR)/usr/bin
+	fakeroot install -v dut-switch-off $(DESTDIR)/usr/bin
+	fakeroot install -v dut-hard-reset $(DESTDIR)/usr/bin
 
 clean:
 	rm -f dut-dump-probe *.o
