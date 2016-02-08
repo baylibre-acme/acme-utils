@@ -29,7 +29,7 @@ This app can be used at startup from an init script to set the Shunt resistor va
 in the driver.
 
 ```
-  (target)#> dut-dump-probe 1 -s/--shunt
+  (target)#> dut-dump-probe 1 -r/--rshunt
   80000
 ```
 

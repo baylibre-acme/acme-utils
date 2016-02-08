@@ -53,19 +53,27 @@ static FILE *fout;
 static int bus_number = 1;
 static int probe_number;
 
+#define F_SERNUM 0x1
+#define F_RSHUNT 0x2
+
 static const struct option options[] = {
 	{"help", no_argument, 0, 'h'},
 	{"bus", required_argument, 0, 'b'},
+	{"rshunt", no_argument, 0, 'r'},
+	{"sernum", no_argument, 0, 's'},
 	{0, 0, 0, 0},
 };
 
 static const char *options_descriptions[] = {
 	"Show this help and quit.",
-	"the number of the i2c bus, usually it will be i2c1.",
+	"The number of the i2c bus, usually it will be i2c1.",
+	"Only print the value of RShunt.",
+	"Only print the serialnumber.",
 };
 
-static void dump_probe(struct probe_eeprom *p)
+static void dump_probe(struct probe_eeprom *p, int flags)
 {
+	if (!flags) {
 	switch (p->type) {
 	case EEPROM_PROBE_TYPE_USB:
 		printf("PowerProbe USB @slot %d:", probe_number);
@@ -86,15 +94,28 @@ static void dump_probe(struct probe_eeprom *p)
                 printf("\tReB\n");
                 break;
         default:
-                printf("Rev??");
+                printf("Rev??\n");
                 return;
         }
 
 	if (p->pwr_sw)
-		printf("\tHas Power Switch");
+		printf("\tHas Power Switch\n");
 
-	printf("\tRShunt: %d", p->shunt);
-	printf("\tSerNum: %x", *(uint32_t*)p->serial);
+	printf("\tR_Shunt: %d uOhm\n", p->shunt);
+
+	printf("\tSerial Number: %x-%x-%x-%x\n", ((unsigned int*)p->serial)[0],
+		((unsigned int*)p->serial)[1],
+		((unsigned int*)p->serial)[2],
+		((unsigned int*)p->serial)[3]);
+	}
+	else if (flags & F_SERNUM)
+		printf("%x-%x-%x-%x\n", ((unsigned int*)p->serial)[0],
+                ((unsigned int*)p->serial)[1],
+                ((unsigned int*)p->serial)[2],
+                ((unsigned int*)p->serial)[3]);
+	else if (flags & F_RSHUNT)
+		 printf("%d\n", p->shunt);
+
 }
 
 
@@ -102,7 +123,7 @@ static void usage(char *app)
 {
 	unsigned int i;
 
-	printf("Usage:\n\t %s [-b <bus>] <probe_number in 0..7> \n\nOptions:\n",
+	printf("Usage:\n\t %s [-b <bus>] [-r/--rshunt] [-s/--sernum] <probe_number in 0..7> \n\nOptions:\n",
 	       app);
 	for (i = 0; options[i].name; i++)
 		printf("\t-%c, --%s\n\t\t\t%s\n",
@@ -112,10 +133,10 @@ static void usage(char *app)
 
 int main(int argc, char **argv)
 {
-	int c, option_index = 0, arg_index = 0;
+	int c, option_index = 0, arg_index = 0, print_flags = 0;
 	char temp[1024];
 
-	while ((c = getopt_long(argc, argv, "+hb:",
+	while ((c = getopt_long(argc, argv, "+rshb:",
 				options, &option_index)) != -1) {
 		switch (c) {
 		case 'h':
@@ -124,6 +145,14 @@ int main(int argc, char **argv)
 		case 'b':
 			arg_index += 2;
 			bus_number = argv[arg_index][0] - '0';
+			break;
+		case 'r':
+			arg_index++;
+			print_flags |= F_RSHUNT; /* only */
+			break;
+		case 's':
+			arg_index++;
+			print_flags |= F_SERNUM; /* only */
 			break;
 		case '?':
 			return EXIT_FAILURE;
@@ -157,7 +186,7 @@ int main(int argc, char **argv)
 
 	if (fread(my_probe, sizeof(struct probe_eeprom), 1, fout) ==
 	    sizeof(struct probe_eeprom))
-		dump_probe(my_probe);
+		dump_probe(my_probe, print_flags);
 
 	return 0;
 }

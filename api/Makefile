@@ -12,7 +12,7 @@
 # Lesser General Public License for more details.
 
 DESTDIR?=$(INSTALL_MOD_PATH)/usr/bin
-CC=?=$(CROSS_COMPILE)gcc
+CC?=$(CROSS_COMPILE)gcc
 CFLAGS?=-Wall -g -O1
 
 TARGETS:=dut-dump-probe \
