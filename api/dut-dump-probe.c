@@ -40,7 +40,7 @@ struct probe_eeprom {
 	int8_t tag[EEPROM_TAG_SIZE];
 };
 
-static struct probe_eeprom my_probe;
+static struct probe_eeprom raw_data;
 
 #define EEPROM_SIZE (3 * sizeof(uint32_t) + 1 + EEPROM_SERIAL_SIZE + EEPROM_TAG_SIZE)
 
@@ -58,8 +58,8 @@ static int bus_number = 1;
 #define ACME_PROBE_LAST  8
 static int probe_number;
 
-#define F_SERNUM 0x1
-#define F_RSHUNT 0x2
+#define F_SERNUM_ONLY 0x1
+#define F_RSHUNT_ONLY 0x2
 
 static const struct option options[] = {
 	{"help", no_argument, 0, 'h'},
@@ -76,50 +76,70 @@ static const char *options_descriptions[] = {
 	"Only print the serialnumber.",
 };
 
+static unsigned long swapall(unsigned long a)
+{
+	unsigned long b =  ((char*)&a)[3] |
+			(((char*)&a)[2] << 8)  |
+			(((char*)&a)[1] << 16) |
+			(((char*)&a)[0] << 24);
+	return b;
+}
+
 static void dump_probe(struct probe_eeprom *p, int flags)
 {
+	int i, pwr_offset;
+	struct probe_eeprom my_probe;
+	char *buf = (char*)&(my_probe.serial);
+
+	my_probe.type = swapall(p->type);
+	my_probe.rev = swapall(p->rev);
+	my_probe.shunt = swapall(p->shunt);
+
+	my_probe.pwr_sw = ((char*)p)[EEPROM_OFF_PWR_SW];
+
+	for (i = EEPROM_OFF_TAG - 1; i > -1; i--)
+		buf[EEPROM_OFF_TAG - 1 - i] = ((char*)p)[i];
+
 	if (!flags) {
-		switch (p->type) {
+		switch (my_probe.type) {
 		case EEPROM_PROBE_TYPE_USB:
-			printf("PowerProbe USB @slot %d:", probe_number);
+			printf("PowerProbe USB @slot %d (%x):\n", probe_number,
+				my_probe.type);
 			break;
 		case EEPROM_PROBE_TYPE_JACK:
-			printf("PowerProbe JACK @slot %d:", probe_number);
+			printf("PowerProbe JACK @slot %d (%x):\n", probe_number,
+				my_probe.type);
 			break;
 		case EEPROM_PROBE_TYPE_HE10:
-			printf("PowerProbe HE10 @slot %d:", probe_number);
+			printf("PowerProbe HE10 @slot %d (%x):\n", probe_number,
+				my_probe.type);
 			break;
 		default:
-			printf("Unknown probe type %d.", p->type);
+			printf("Unknown probe type %d.", my_probe.type);
 			return;
 		}
 
-		switch (p->rev) {
+		switch (my_probe.rev) {
 		case 'B':
-			printf("\tReB\n");
+			printf("\tRevB\n");
 			break;
 		default:
-			printf("Unknown Revision '%c'\n", p->rev);
+			printf("Unknown Revision '%c'\n", my_probe.rev);
 			return;
 		}
 
 		if (p->pwr_sw)
 			printf("\tHas Power Switch\n");
 
-		printf("\tR_Shunt: %d uOhm\n", p->shunt);
+		printf("\tR_Shunt: %d uOhm\n", my_probe.shunt);
 
-		printf("\tSerial Number: %x-%x-%x-%x\n",
-		       ((unsigned int *)p->serial)[0],
-		       ((unsigned int *)p->serial)[1],
-		       ((unsigned int *)p->serial)[2],
-		       ((unsigned int *)p->serial)[3]);
-	} else if (flags & F_SERNUM)
-		printf("%x-%x-%x-%x\n", ((unsigned int *)p->serial)[0],
-		       ((unsigned int *)p->serial)[1],
-		       ((unsigned int *)p->serial)[2],
-		       ((unsigned int *)p->serial)[3]);
-	else if (flags & F_RSHUNT)
-		printf("%d\n", p->shunt);
+		printf("\tSerial Number: %08x-%08x\n", ((unsigned int *)my_probe.serial)[0],
+		       ((unsigned int *)my_probe.serial)[1]);
+	} else if (flags & F_SERNUM_ONLY)
+		printf("%08x-%08x\n", ((unsigned int *)my_probe.serial)[0],
+		       ((unsigned int *)my_probe.serial)[1]);
+	else if (flags & F_RSHUNT_ONLY)
+		printf("%d\n", my_probe.shunt);
 
 }
 
@@ -141,7 +161,7 @@ int main(int argc, char **argv)
 	int c, option_index = 0, arg_index = 0, print_flags = 0;
 	char temp[1024];
 
-	while ((c = getopt_long(argc, argv, "+rshb:",
+	while ((c = getopt_long(argc, argv, "+hb:rs",
 				options, &option_index)) != -1) {
 		switch (c) {
 		case 'h':
@@ -153,11 +173,11 @@ int main(int argc, char **argv)
 			break;
 		case 'r':
 			arg_index++;
-			print_flags |= F_RSHUNT;
+			print_flags = F_RSHUNT_ONLY;
 			break;
 		case 's':
 			arg_index++;
-			print_flags |= F_SERNUM;
+			print_flags = F_SERNUM_ONLY;
 			break;
 		case '?':
 			return EXIT_FAILURE;
@@ -182,7 +202,7 @@ int main(int argc, char **argv)
 	sprintf(temp, "/sys/class/i2c-dev/i2c-%1d/device/%1d-005%1d/eeprom",
 		bus_number, bus_number, probe_number - 1);
 
-	printf("Trying %s\n", temp);
+	printf("Trying %s, with flags %x\n", temp, print_flags);
 
 	fout = fopen(temp, "rb");
 	if (!fout) {
@@ -190,9 +210,8 @@ int main(int argc, char **argv)
 		return -2;
 	}
 
-	if (fread(&my_probe, sizeof(struct probe_eeprom), 1, fout) ==
-	    sizeof(struct probe_eeprom))
-		dump_probe(&my_probe, print_flags);
+	if (fread(&raw_data, sizeof(struct probe_eeprom), 1, fout))
+		dump_probe(&raw_data, print_flags);
 
 	return 0;
 }
