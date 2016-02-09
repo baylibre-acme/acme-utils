@@ -54,8 +54,8 @@ static struct probe_eeprom raw_data;
 static FILE *fout;
 static int bus_number = 1;
 
-#define ACME_PROBE_FIRST 1
-#define ACME_PROBE_LAST  8
+#define ACME_PROBE_FIRST 0
+#define ACME_PROBE_LAST  7
 static int probe_number;
 
 #define F_SERNUM_ONLY 0x1
@@ -148,7 +148,7 @@ static void usage(char *app)
 	unsigned int i;
 
 	printf
-	    ("Usage:\n\t %s [-b/--bus <bus>] [-r/--rshunt] [-s/--sernum] <probe_number in 1..8> \n\nOptions:\n",
+	    ("Usage:\n\t %s [-b/--bus <bus>] [-r/--rshunt] [-s/--sernum] <probe_number in 0..7> \n\nOptions:\n",
 	     app);
 	for (i = 0; options[i].name; i++)
 		printf("\t-%c, --%s\n\t\t\t%s\n",
@@ -200,9 +200,9 @@ int main(int argc, char **argv)
 	}
 
 	sprintf(temp, "/sys/class/i2c-dev/i2c-%1d/device/%1d-005%1d/eeprom",
-		bus_number, bus_number, probe_number - 1);
+		bus_number, bus_number, probe_number);
 
-	printf("Trying %s, with flags %x\n", temp, print_flags);
+//	printf("Trying %s, with flags %x\n", temp, print_flags);
 
 	fout = fopen(temp, "rb");
 	if (!fout) {
