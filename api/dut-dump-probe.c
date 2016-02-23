@@ -16,7 +16,7 @@
  * */
 
 #include <getopt.h>
-#include <iio.h>
+#include <stdint.h>
 #include <signal.h>
 #include <signal.h>
 #include <stdio.h>
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 		switch (c) {
 		case 'h':
 			usage(argv[0]);
-			return EXIT_SUCCESS;
+			return 0;
 		case 'b':
 			arg_index += 2;
 			bus_number = argv[arg_index][0] - '0';
@@ -180,14 +180,14 @@ int main(int argc, char **argv)
 			print_flags = F_SERNUM_ONLY;
 			break;
 		case '?':
-			return EXIT_FAILURE;
+			return 1;
 		}
 	}
 
 	if (++arg_index >= argc) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
 		usage(argv[0]);
-		return EXIT_FAILURE;
+		return 1;
 	}
 
 	probe_number = argv[arg_index][0] - '0';
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 	    || (probe_number < ACME_PROBE_FIRST)) {
 		fprintf(stderr, "Invalid probe number %d.\n\n", probe_number);
 		usage(argv[0]);
-		return EXIT_FAILURE;
+		return 1;
 	}
 
 	sprintf(temp, "/sys/class/i2c-dev/i2c-%1d/device/%1d-005%1d/eeprom",
