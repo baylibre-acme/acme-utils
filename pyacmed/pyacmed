@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+'''
+Python ACME RPC Daemon
+'''
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
+
+PYACMED_VERSION = "0.1"
+
+def run_cmd(cmd, arg=""):
+    try:
+        (output, error) = subprocess.Popen([cmd, arg], \
+                                        stdout = subprocess.PIPE, \
+                                        stderr= subprocess.PIPE).communicate()
+        return output
+    except:
+        return False
+
+class RequestHandler(SimpleXMLRPCRequestHandler):
+    rpc_paths = ('/acme',)
+
+# Create server
+server = SimpleXMLRPCServer(("0.0.0.0", 8000),
+                            requestHandler=RequestHandler)
+server.register_introspection_functions()
+
+# Info function, get ACME info string
+def version():
+	return PYACMED_VERSION
+server.register_function(version)
+
+# Dump the probe configuration
+def info(probe):
+	txt = run_cmd("dut-dump-probe", probe)
+	if txt:
+		return txt
+	else:
+	 	return "Failed"
+server.register_function(info)
+
+# Switch Probe On, takes <probe> id as argument
+def switch_on(probe):
+	if run_cmd("dut-switch-on", probe):
+		return "Success"
+	else:
+	 	return "Failed"
+server.register_function(switch_on)
+
+# Switch Probe Off, takes <probe> id as argument
+def switch_off(probe):
+	if run_cmd("dut-switch-off", probe):
+		return "Success"
+	else:
+	 	return "Failed"
+server.register_function(switch_off)
+
+# Run the server's main loop
+server.serve_forever()
