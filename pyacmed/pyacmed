@@ -5,15 +5,15 @@ Python ACME RPC Daemon
 '''
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
+import subprocess
 
 PYACMED_VERSION = "0.1"
 
 def run_cmd(cmd, arg=""):
     try:
-        (output, error) = subprocess.Popen([cmd, arg], \
+        return subprocess.Popen([cmd, arg], \
                                         stdout = subprocess.PIPE, \
                                         stderr= subprocess.PIPE).communicate()
-        return output
     except:
         return False
 
@@ -32,28 +32,42 @@ server.register_function(version)
 
 # Dump the probe configuration
 def info(probe):
-	txt = run_cmd("dut-dump-probe", probe)
+	probe_fixed = int(probe) - 1
+	if probe_fixed < 0:
+		return "Please provide a probe number >= 1"
+	(txt, err) = run_cmd("dut-dump-probe", "%d" % probe_fixed)
 	if txt:
 		return txt
 	else:
-	 	return "Failed"
+	 	return "Failed (%s)" % err
 server.register_function(info)
 
 # Switch Probe On, takes <probe> id as argument
 def switch_on(probe):
-	if run_cmd("dut-switch-on", probe):
+	if int(probe) < 1:
+		return "Please provide a probe number >= 1"
+	(txt, err) = run_cmd("dut-switch-on", probe)
+	if not err:
 		return "Success"
 	else:
-	 	return "Failed"
+	 	return "Failed (%s)" % err
 server.register_function(switch_on)
 
 # Switch Probe Off, takes <probe> id as argument
 def switch_off(probe):
-	if run_cmd("dut-switch-off", probe):
+	if int(probe) < 1:
+		return "Please provide a probe number >= 1"
+	(txt, err) = run_cmd("dut-switch-off", probe)
+	if not err:
 		return "Success"
 	else:
-	 	return "Failed"
+	 	return "Failed (%s)" % err
 server.register_function(switch_off)
+
+# System software reboot
+def system_reboot():
+	run_cmd("reboot")
+server.register_function(system_reboot)
 
 # Run the server's main loop
 server.serve_forever()
