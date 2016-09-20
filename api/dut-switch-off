@@ -1,8 +1,10 @@
 #!/bin/sh
 #
-# convert probe number to GPIO number
+# disable probe
 
-num=$((2*$(( $1 -1 ))+489))
+probe=$(( $1 -1 ))
 
-echo 0 > /sys/class/gpio/gpio$num/value
-
+if [ -f /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active ]
+then
+      echo 0 > /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active
+fi
