@@ -6,5 +6,6 @@ probe=$(( $1 -1 ))
 
 if [ -f /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active ]
 then
-      echo 1 > /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active
+      in_active=`ls /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active`
+      echo 1 > $in_active
 fi
