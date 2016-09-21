@@ -2,6 +2,8 @@
 #
 # enable probe
 
+[ -z "$1" ] && echo "Usage: $0 <probe: 1 to 8>" && exit 1
+
 probe=$(( $1 -1 ))
 
 if [ -f /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active ]
