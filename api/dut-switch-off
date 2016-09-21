@@ -8,4 +8,10 @@ if [ -f /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active ]
 then
       in_active=`ls /sys/bus/i2c/devices/4-004$probe/iio:device*/in_active`
       echo 0 > $in_active
+elif [ $probe -ge 0 -a $probe -lt 8 ]
+then
+      echo "Probe "$(( $probe + 1 ))" is not connected"
+else
+      echo "Invalid probe number" $(( $probe + 1 ))
+      exit 1
 fi
