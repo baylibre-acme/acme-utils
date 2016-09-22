@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+'''
+Python ACME Shell
+'''
+import subprocess
+import cmd, sys
+import traceback
+
+def run_cmd(cmd, arg=""):
+	try:
+		return subprocess.Popen([cmd, arg], \
+				stdout = subprocess.PIPE, \
+				stderr= subprocess.PIPE).communicate()
+	except:
+		return (None, "Invalid command %s\n" % cmd)
+
+class AcmeShell(cmd.Cmd):
+	intro = 'Welcome to the acme shell.   Type help or ? to list commands.\n'
+	prompt = '(acme) '
+	file = None
+
+	def do_ls(self, arg):
+		'List all connected probes'
+		for probe in range(0, 8):
+			(txt, err) = run_cmd("dut-dump-probe", "%d" % probe)
+			if txt:
+				sys.stdout.buffer.write(txt)
+			else:
+				print("Not Connected @slot %d" % probe)
+
+	def do_info(self, arg):
+		'Print information about a specific probe: 0 > probe > 8'
+		try:
+			probe = int(arg) - 1
+			if probe < 0:
+				print("Please provide a probe number >= 1")
+				return False
+			(txt, err) = run_cmd("dut-dump-probe", "%d" % probe)
+			if txt:
+				sys.stdout.buffer.write(txt)
+			else:
+				print("Probe %d is not connected" % (probe+1))
+		except Exception as e:
+			print("error: Please provide a probe number (%s)" % e)
+
+		return False
+
+	def do_switch_on(self, arg):
+		'Switch on a probe: 0 > probe > 8'
+		try:
+			probe = int(arg)
+			if probe < 0:
+				print("Please provide a probe number >= 1")
+				return False
+			(txt, err) = run_cmd("dut-switch-on", "%d" % probe)
+			if txt:
+				sys.stdout.buffer.write(txt)
+			else:
+				sys.stdout.buffer.write(err)
+		except Exception as e:
+			print("error: Please provide a probe number (%s)" % e)
+
+		return False
+
+	def do_switch_off(self, arg):
+		'Switch off a probe: 0 > probe > 8'
+		try:
+			probe = int(arg)
+			if probe < 0:
+				print("Please provide a probe number >= 1")
+				return False
+			(txt, err) = run_cmd("dut-switch-off", "%d" % probe)
+			if txt:
+				sys.stdout.buffer.write(txt)
+			else:
+				sys.stdout.buffer.write(err)
+		except Exception as e:
+			print("error: Please provide a probe number (%s)" % e)
+
+		return False
+
+	def do_reboot(self, arg):
+		'Reboot system'
+		run_cmd("reboot", arg)
+		return True
+
+	def do_exit(self, arg):
+		'Exit shell'
+		return True
+
+if __name__ == '__main__':
+	AcmeShell().cmdloop()
