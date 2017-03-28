@@ -52,7 +52,7 @@ static struct probe_eeprom raw_data;
 #define EEPROM_OFF_TAG		(EEPROM_OFF_SERIAL + EEPROM_SERIAL_SIZE)
 
 static FILE *fout;
-static int bus_number = 4;
+static int bus_number = 1;
 
 #define ACME_PROBE_FIRST 0
 #define ACME_PROBE_LAST  7
