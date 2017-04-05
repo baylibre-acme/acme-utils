@@ -148,7 +148,7 @@ static void usage(char *app)
 	unsigned int i;
 
 	printf
-	    ("Usage:\n\t %s [-b/--bus <bus>] [-r/--rshunt] [-s/--sernum] <probe_number in 0..7> \n\nOptions:\n",
+	    ("Usage:\n\t %s [-b/--bus <bus>] [-r/--rshunt] [-s/--sernum] <probe_number in 1..8> \n\nOptions:\n",
 	     app);
 	for (i = 0; options[i].name; i++)
 		printf("\t-%c, --%s\n\t\t\t%s\n",
@@ -190,12 +190,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	probe_number = argv[arg_index][0] - '0';
+	probe_number = atoi(argv[arg_index]) - 1;
 
 	if ((probe_number > ACME_PROBE_LAST)
 	    || (probe_number < ACME_PROBE_FIRST)) {
-		fprintf(stderr, "Invalid probe number %d.\n\n", probe_number);
-		usage(argv[0]);
+		fprintf(stderr, "Invalid probe number %d\n", probe_number+1);
 		return 1;
 	}
 
