@@ -103,15 +103,15 @@ static void dump_probe(struct probe_eeprom *p, int flags)
 	if (!flags) {
 		switch (my_probe.type) {
 		case EEPROM_PROBE_TYPE_USB:
-			printf("PowerProbe USB @slot %d (%x):\n", probe_number,
+			printf("PowerProbe USB @slot %d (%x):\n", probe_number+1,
 				my_probe.type);
 			break;
 		case EEPROM_PROBE_TYPE_JACK:
-			printf("PowerProbe JACK @slot %d (%x):\n", probe_number,
+			printf("PowerProbe JACK @slot %d (%x):\n", probe_number+1,
 				my_probe.type);
 			break;
 		case EEPROM_PROBE_TYPE_HE10:
-			printf("PowerProbe HE10 @slot %d (%x):\n", probe_number,
+			printf("PowerProbe HE10 @slot %d (%x):\n", probe_number+1,
 				my_probe.type);
 			break;
 		default:
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 	fout = fopen(temp, "rb");
 	if (!fout) {
 		//fprintf(stderr, "Could not open %s.\n", temp);
-		fprintf(stderr, "Probe %d seems not connected\n", probe_number);
+		fprintf(stderr, "Probe %d seems not connected\n", probe_number+1);
 		return -2;
 	}
 
