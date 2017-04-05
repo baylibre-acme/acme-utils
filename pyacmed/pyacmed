@@ -5,6 +5,7 @@ Python ACME RPC Daemon
 '''
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
+import socketserver
 import subprocess
 
 PYACMED_VERSION = "0.1"
@@ -20,9 +21,12 @@ def run_cmd(cmd, arg=""):
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/acme',)
 
+class SimpleThreadedXMLRPCServer(socketserver.ThreadingMixIn, SimpleXMLRPCServer):
+        pass
+
 # Create server
-server = SimpleXMLRPCServer(("0.0.0.0", 8000),
-                            requestHandler=RequestHandler)
+server = SimpleThreadedXMLRPCServer(("0.0.0.0", 8000),
+                                    requestHandler=RequestHandler)
 server.register_introspection_functions()
 
 # Info function, get ACME info string
