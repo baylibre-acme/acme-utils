@@ -36,10 +36,9 @@ server.register_function(version)
 
 # Dump the probe configuration
 def info(probe):
-	probe_fixed = int(probe) - 1
-	if probe_fixed < 0:
+	if int(probe) < 1:
 		return "Please provide a probe number >= 1"
-	(txt, err) = run_cmd("dut-dump-probe", "%d" % probe_fixed)
+	(txt, err) = run_cmd("dut-dump-probe", probe)
 	if txt:
 		return txt.decode("utf-8").rstrip()
 	else:
