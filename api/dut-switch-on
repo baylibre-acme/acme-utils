@@ -12,8 +12,9 @@ then
       echo 1 > $in_active
 elif [ $probe -ge 0 -a $probe -lt 8 ]
 then
-      echo "Probe "$(( $probe + 1 ))" is not connected"
+      echo "Probe "$(( $probe + 1 ))" is not connected" >&2
+      exit 1
 else
-      echo "Invalid probe number" $(( $probe + 1 ))
+      echo "Invalid probe number" $(( $probe + 1 )) >&2
       exit 1
 fi

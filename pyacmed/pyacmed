@@ -41,9 +41,9 @@ def info(probe):
 		return "Please provide a probe number >= 1"
 	(txt, err) = run_cmd("dut-dump-probe", "%d" % probe_fixed)
 	if txt:
-		return txt
+		return txt.decode("utf-8").rstrip()
 	else:
-	 	return "Failed (%s)" % err
+		return "Failed (%s)" % err.decode("utf-8").rstrip()
 server.register_function(info)
 
 # Switch Probe On, takes <probe> id as argument
@@ -54,7 +54,7 @@ def switch_on(probe):
 	if not err:
 		return "Success"
 	else:
-	 	return "Failed (%s)" % err
+		return "Failed (%s)" % err.decode("utf-8").rstrip()
 server.register_function(switch_on)
 
 # Switch Probe Off, takes <probe> id as argument
@@ -65,7 +65,7 @@ def switch_off(probe):
 	if not err:
 		return "Success"
 	else:
-	 	return "Failed (%s)" % err
+		return "Failed (%s)" % err.decode("utf-8").rstrip()
 server.register_function(switch_off)
 
 # System software reboot

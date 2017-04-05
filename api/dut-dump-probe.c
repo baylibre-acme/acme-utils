@@ -206,7 +206,8 @@ int main(int argc, char **argv)
 
 	fout = fopen(temp, "rb");
 	if (!fout) {
-		fprintf(stderr, "Could not open %s.\n", temp);
+		//fprintf(stderr, "Could not open %s.\n", temp);
+		fprintf(stderr, "Probe %d seems not connected\n", probe_number);
 		return -2;
 	}
 
