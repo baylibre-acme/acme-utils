@@ -1,12 +1,11 @@
 [Unit]
 Description=ACME XML-RPC Service
 After=network.target
-After=systemd-modules.service
 
 [Service]
 Type=simple
 User=root
-ExecStart=@BINDIR@/pyacmed
+ExecStart=/usr/local/bin/pyacmed
 
 [Install]
 WantedBy=multi-user.target

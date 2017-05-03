@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# ACME init
+#
+
+for iiodev in /sys/bus/iio/devices/iio:device*
+do
+  if [ -f $iiodev/in_active ]
+  then
+	echo 1 > $iiodev/in_active
+  fi
+done

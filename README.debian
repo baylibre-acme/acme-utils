@@ -1,0 +1,50 @@
+ACME on Debian
+==============
+
+1) Install latest debian image
+
+2) Build a new bb-kernel .deb with the following options changed :
+
+```
+git clone https://github.com/RobertCNelson/bb-kernel.git -b am33x-v4.9
+cd bb-kernel
+./build_deb.sh
+=> In menuconfig change :
+	CONFIG_SENSORS_INA2XX=n
+	CONFIG_I2C_MUX_GPIO=m
+```
+
+3) Copy the .deb files on the sdcard
+
+4) Boot the BBB
+
+5) Install the deb packages :
+
+```
+sudo dpkg -i *.deb
+sudo apt-get -f install
+```
+
+6) Reboot
+
+7) Install the ACME overlay (if not already present)
+
+```
+git clone https://github.com/baylibre-acme/bb.org-overlays -b acme-revb
+cd bb.org-overlays
+./install.sh
+```
+
+8) Enable the ACME cape in u-boot
+
+sudo sh -c "echo cape_enable=bone_capemgr.enable_partno=ACME:revB >> /boot/uEnv.txt"
+
+9) Clone acme-utils branch bb-debian
+
+```
+git clone https://github.com/baylibre-acme/acme-utils -b bb-debian
+cd acme-utils
+./install.sh
+```
+
+10) reboot & enjoy !

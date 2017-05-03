@@ -1,0 +1,14 @@
+[Unit]
+Description=ACME IIO probes wakeup script
+After=network.target
+After=acme-iio-init.service
+ConditionPathExists=/sys/bus/iio/devices
+
+[Service]
+Type=oneshot
+RemainAfterExit=No
+User=root
+ExecStart=/usr/local/bin/acme-iio-wakeup
+
+[Install]
+WantedBy=multi-user.target

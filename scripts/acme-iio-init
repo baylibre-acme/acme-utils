@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# ACME init
+#
+for probe in 0 1 2 3 4 5 6 7
+do
+  if [ -f /sys/bus/i2c/devices/3-004$probe/iio:device*/in_shunt_resistor ]
+  then
+	iiodevice=`ls /sys/bus/i2c/devices/3-004$probe/iio:device*/in_shunt_resistor`
+	rshunt=`dut-dump-probe -b 3 -r $probe`
+	echo $rshunt > $iiodevice
+  fi
+done

@@ -1,0 +1,13 @@
+[Unit]
+Description=ACME IIO probes init script
+After=network.target
+ConditionPathExists=/sys/bus/iio/devices
+
+[Service]
+Type=oneshot
+RemainAfterExit=No
+User=root
+ExecStart=/usr/local/bin/acme-iio-init
+
+[Install]
+WantedBy=multi-user.target
