@@ -1,6 +1,7 @@
 [Unit]
 Description=ACME IIO probes init script
 After=network.target
+After=systemd-modules-load.service
 ConditionPathExists=/sys/bus/iio/devices
 
 [Service]

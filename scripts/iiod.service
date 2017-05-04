@@ -1,0 +1,11 @@
+[Unit]
+Description=IIO Deamon
+After=network.target
+After=acme-iio-init.service
+
+[Service]
+PIDFile=/var/run/iiod.pid
+ExecStart=/usr/local/bin/iiod
+
+[Install]
+WantedBy=multi-user.target

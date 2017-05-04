@@ -43,6 +43,27 @@ sudo sh -c "echo cape_enable=bone_capemgr.enable_partno=ACME:revB >> /boot/uEnv.
 git clone https://github.com/baylibre-acme/acme-utils -b bb-debian
 cd acme-utils
 ./install.sh
+sudo systemctl enable acme-iio-init
+sudo systemctl enable acme-iio-wakeup
+sudo systemctl enable pyacmed
 ```
 
-10) reboot & enjoy !
+10) Install an earlier iiod
+```
+apt install cmake libxml2-dev
+wget https://github.com/analogdevicesinc/libiio/archive/2015.2-r1.tar.gz
+tar xvfz 2015.2-r1.tar.gz
+cd libiio-2015.2-r1/
+cmake .
+make
+cp iiod/iiod /usr/local/bin/
+cp scripts/iiod.service /etc/systemd/system
+sudo systemctl enable iiod
+```
+
+11) Remove invalid modules loading conf
+```
+sudo rm /etc/modules-load.d/roboticscape_modules.conf
+```
+
+12) reboot & enjoy !
