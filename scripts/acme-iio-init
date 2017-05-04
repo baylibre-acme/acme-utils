@@ -7,7 +7,9 @@ do
   if [ -f /sys/bus/i2c/devices/3-004$probe/iio:device*/in_shunt_resistor ]
   then
 	iiodevice=`ls /sys/bus/i2c/devices/3-004$probe/iio:device*/in_shunt_resistor`
-	rshunt=`dut-dump-probe -b 3 -r $probe`
+	rshunt=`dut-dump-probe -b 3 -r $(expr $probe + 1)`
 	echo $rshunt > $iiodevice
   fi
 done
+
+exit 0
