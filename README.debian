@@ -6,13 +6,11 @@ ACME on Debian
 2) Build a new bb-kernel .deb with the following options changed :
 
 ```
-git clone https://github.com/RobertCNelson/bb-kernel.git -b am33x-v4.9
+git clone https://github.com/baylibre-acme/bb-kernel.git -b am33x-v4.9-acme
 cd bb-kernel
 ./build_deb.sh
-=> In menuconfig change :
-	CONFIG_SENSORS_INA2XX=n
-	CONFIG_I2C_MUX_GPIO=m
 ```
+Or download the pre-built debs on : https://github.com/baylibre-acme/bb-kernel/releases/tag/v4.9.25-acme
 
 3) Copy the .deb files on the sdcard
 
