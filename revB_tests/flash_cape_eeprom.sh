@@ -1,5 +1,8 @@
 #!/bin/sh
 
+source cape.sh
+init_cape
+
 INPUT_PATH="/tmp/acme_eeprom_data"
 
 make_input() {
@@ -58,11 +61,7 @@ do_i2cget() {
 }
 
 cape_read_serial() {
-	printf "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n" \
-		$(do_i2cget 0x80) $(do_i2cget 0x81) $(do_i2cget 0x82) $(do_i2cget 0x83) \
-		$(do_i2cget 0x84) $(do_i2cget 0x85) $(do_i2cget 0x86) $(do_i2cget 0x87) \
-		$(do_i2cget 0x88) $(do_i2cget 0x89) $(do_i2cget 0x8a) $(do_i2cget 0x8b) \
-		$(do_i2cget 0x8c) $(do_i2cget 0x8d) $(do_i2cget 0x8e) $(do_i2cget 0x8f)
+	dd if=/sys/class/i2c-adapter/i2c-1/1-005c/eeprom bs=8 skip=1 count=1 | hexdump -ve '1/1 "%.2x"'
 }
 
 if [ ! "$#" == "1" ]
@@ -82,9 +81,12 @@ SERIAL=$(cape_read_serial)
 modprobe at24 2> /dev/null
 modprobe gpio-pca953x 2> /dev/null
 
-set -e
-echo 24c02 0x54 > /sys/class/i2c-adapter/i2c-1/new_device
+echo 24c32 0x54 > /sys/class/i2c-adapter/i2c-1/new_device
+echo 24cs32 0x5c > /sys/class/i2c-adapter/i2c-1/new_device
+SERIAL=$(cape_read_serial)
+echo $SERIAL
 echo pca9534 0x21  > /sys/class/i2c-adapter/i2c-1/new_device
+set -e
 echo 505 > /sys/class/gpio/export
 echo out > /sys/class/gpio/gpio505/direction
 make_input
@@ -92,6 +94,7 @@ cat $INPUT_PATH | $MKEEPROM > /dev/null
 cat $OUT > /sys/class/i2c-dev/i2c-1/device/1-0054/eeprom
 echo 505 > /sys/class/gpio/unexport
 echo 0x54 > /sys/class/i2c-adapter/i2c-1/delete_device
+echo 0x5c > /sys/class/i2c-adapter/i2c-1/delete_device
 echo 0x21  > /sys/class/i2c-adapter/i2c-1/delete_device
 
 echo "data written to eeprom"
